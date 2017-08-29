@@ -1,0 +1,52 @@
+;;;; --------------------------------------------------------------------------
+;;;; @title A contract that illustrates LLL contract structure.
+;;;; @author Daniel Ellison <daniel@syrinx.net>
+
+(seq
+
+  ;; Define the macros for this contract.
+  (include "./Macros.lll")
+
+  ;;; -------------------------------------------------------------------------
+
+  ;; Our constructor is marked as 'payable: false' in its ABI specification,
+  ;; so we abort if any ETH was passed in during the deployment process.
+  (when (callvalue)
+    (panic))
+
+  ;; Store the single constructor argument.
+  (codecopy *scratch* (bytecodesize) 32)
+  (sstore *parameter* (mload *scratch*))
+
+  ;;; -------------------------------------------------------------------------
+  ;;; CODE
+
+  (returnlll
+    (seq
+
+      ;; Since the requested function ID could be used many times in a more
+      ;; complex contract, we retrieve and save it for future use. This
+      ;; technique is courtesy of Ben Edgington. See macros.lll for its
+      ;; definition.
+      get-function-id
+
+      ;; ----------------------------------------------------------------------
+      ;; @notice Returns the value passed into the constructor.
+      ;; @dev Signature: getConstructorParameter()
+      ;; @return The value passed into the constructor.
+
+      (function *get-constructor-parameter*
+        (seq unpayable
+
+          ;; This takes the constructor parameter and stores it in memory at
+          ;; *scratch*, which resolves to 0x00.
+          (mstore *scratch* (sload *parameter*))
+
+          ;; The 'return' operator takes a memory location and a length and
+          ;; returns the data at that memory location of the specified length.
+          (return *scratch* 32)))
+
+      ;; ----------------------------------------------------------------------
+      ;; @notice Fallback: No functions matched the function ID provided.
+
+      (panic))))

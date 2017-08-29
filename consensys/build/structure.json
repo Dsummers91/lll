@@ -1,0 +1,1 @@
+[{"constant":true,"inputs":[],"name":"getConstructorParameter","outputs":[{"name":"","type":"bytes32"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"param","type":"bytes32"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"}]
