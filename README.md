@@ -14,7 +14,9 @@ Would also be helpful to install geth and testrpc
 Install all four globally 
 
 
+[LLL Compiler Documentation](https://media.readthedocs.org/pdf/lll-docs/latest/lll-docs.pdf)
 
+[Walking Through LLL Contract](https://medium.com/@b.p.edgington/153f2cbe506b)
 
 [An Introduction to LLL for Ethereum Smart Contract Development](https://media.consensys.net/an-introduction-to-lll-for-ethereum-smart-contract-development-e26e38ea6c23)
 
@@ -56,7 +58,7 @@ Put that in contract
 Then generate ABI to communicate with the contract
 
 ```
-solc --hashes Structure.sol
+solc --abi Structure.sol
 ```
 
 Will Output 
@@ -80,3 +82,5 @@ var Structure = web3.eth.contract(abi)
 var contract = Structure.new("test", {data: bin, from: web3.eth.coinbase, gas: 100000})
 contract.getConstructorParameter()
 ```
+
+Well played

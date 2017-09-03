@@ -1,0 +1,52 @@
+;;; TEST CONTRACT
+(seq 
+
+
+
+  (def '*scratch* 0x00)
+  (def '*funcid*  0x20)
+
+  (def '*read-me* 0x82092f1d)
+  (def '*who-dont-give-a-f* 0xbd722ca3)
+
+  (def '*word* 0x00)
+
+  ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
+  (def 'shift-right (input)
+    (div input (exp 2 224)))
+
+  ;; Gets the function ID and stores it in memory for reference.
+  (def 'get-function-id
+    (mstore *funcid* (shift-right (calldataload 0x00))))
+    
+  (def 'function (function-hash code-body)
+    (when (= (mload *funcid*) function-hash)
+      code-body))
+
+
+  (when(callvalue) 
+    (panic))
+  (codecopy *scratch* (bytecodesize) 32)
+  (sstore *word* (mload *scratch*))
+
+
+  (returnlll
+    (seq 
+      get-function-id
+      (function *read-me* 
+        (seq
+          (mstore *scratch* (sload *word*))
+          (return *scratch* 32)
+        ))
+
+        (function *who-dont-give-a-f* 
+          (seq
+          ;;; will return a 32 byte of "IDGAF
+          ;;; But will be "0x000000000000000000000000000000000000000000000000045df61843be5d80"
+          ;;; So (mul 0x4944474146 (exp 2 216)) moves it to the left to be 
+          ;;; "0x4944474146000000000000000000000000000000000000000000000000000000"
+          ;;; Is there a dynamic way to do this for bytes of all sizes?
+            (mstore *scratch*  (mul 0x4944474146 (exp 2 216)))
+            (return *scratch* 32)
+          ))
+    (panic))))

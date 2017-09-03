@@ -1,0 +1,3 @@
+[submodule "erc20"]
+	path = erc20
+	url = https://github.com/benjaminion/LLL_erc20.git

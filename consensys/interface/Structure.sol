@@ -4,4 +4,6 @@ contract Structure {
 
   function Structure(bytes32 param) {}
   function getConstructorParameter() constant returns (bytes32);
+  function getConddstructorParameter() constant returns (bytes32);
+  function() {}
 }
