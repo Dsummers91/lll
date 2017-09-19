@@ -1,0 +1,56 @@
+;;; Crowdsale contract written in LLL.. Practice..
+
+(seq 
+
+  ;; Memory Locations
+  (def '*scratch1* 0x00)
+  (def '*scratch2* 0x20)
+  (def '*scratch3* 0x40)
+  (def '*funcid*   0x60)
+
+  ;; Storage Locations
+  (def '*owner*           0x00)
+  (def '*token-price*     0x01)
+  (def '*crowdsale-state* 0x02)
+
+  ;; Function Hashes
+  (def '*start-crowdsale* 0xa39953b2)
+  (def '*get-address*     0x38cc4831)
+
+
+  ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
+  (def 'shift-right (input)
+    (div input (exp 2 224)))
+
+  ;; Gets the function ID and stores it in memory for reference.
+  (def 'get-function-id
+    (mstore *funcid* (shift-right (calldataload 0x00))))
+    
+  (def 'function (function-hash code-body)
+    (when (= (mload *funcid*) function-hash)
+      code-body))
+
+
+  (when(callvalue) 
+    (panic))
+
+  (returnlll 
+    (seq
+      get-function-id
+
+      (function *start-crowdsale*
+        (seq
+          ;; this parts fubar..
+          (mstore *scratch1* (sload (*crowdsale-state*)))
+          (add *scratch1* 1)
+          (sstore(*crowdsale-state*, *scratch1*))
+          (return)
+      ))
+
+      (function *get-address* 
+        (seq
+          (return (caller))
+      ))
+
+
+)))
