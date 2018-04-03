@@ -16,7 +16,7 @@
   ;; Function Hashes
   (def '*start-crowdsale* 0xa39953b2)
   (def '*get-address*     0x38cc4831)
-
+  (def '*get-crowdsale-state* 0x2d3fb0d5)
 
   ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
   (def 'shift-right (input)
@@ -40,11 +40,17 @@
 
       (function *start-crowdsale*
         (seq
-          ;; this parts fubar..
-          (mstore *scratch1* (sload (*crowdsale-state*)))
-          (add *scratch1* 1)
-          (sstore(*crowdsale-state*, *scratch1*))
-          (return)
+          (mstore *scratch1* (sload *crowdsale-state*))
+          ;; Revert if state isnt 0
+          (when (> (sload *crowdsale-state*) 0)
+            (revert 0 0)) 
+          (mstore *scratch1* (add (mload *scratch1*) 1))
+          (sstore *crowdsale-state* (mload *scratch1*))
+      ))
+
+      (function *get-crowdsale-state*
+        (seq
+          (return (sload *crowdsale-state*))
       ))
 
       (function *get-address* 

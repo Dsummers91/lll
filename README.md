@@ -30,7 +30,7 @@ Once you have your contract ready compile your contract
 
 ```
 cd consensys contracts
-llc Structure.lll
+lllc Structure.lll
 ```
 
 This will output bytcode
@@ -71,7 +71,7 @@ Contract JSON ABI
 Then run test rpc and attach to geth in another terminal and deploy contracts
 
 ```
-testrpc
+ganache-cli
 ```
 
 ```
