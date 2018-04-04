@@ -9,16 +9,19 @@
   (def '*funcid*   0x60)
 
   ;; Storage Locations
-  (def '*owner*           0x00)
-  (def '*token-price*     0x01)
-  (def '*crowdsale-state* 0x02)
+  (def '*owner*            0x00)
+  (def '*token-price*      0x01)
+  (def '*crowdsale-state*  0x02)
+  (def '*multisig*         0x03)
+  (def '*max-supply*       0x04)
 
   ;; Function Hashes
-  (def '*start-crowdsale*     0xa39953b2)
-  (def '*get-address*         0x38cc4831)
-  (def '*get-crowdsale-state* 0x2d3fb0d5)
-  (def '*get-owner*           0x8da5cb5b)
-
+  (def '*start-crowdsale*      0xa39953b2)
+  (def '*get-address*          0x38cc4831)
+  (def '*get-crowdsale-state*  0x2d3fb0d5)
+  (def '*get-owner*            0x8da5cb5b)
+  (def '*get-multisig*         0x4783c35b)
+  (def '*get-max-supply*       0xd5abeb01)
 
   ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
   (def 'shift-right (input)
@@ -36,7 +39,13 @@
   (when(callvalue)
     (panic))
   (sstore *owner* (caller))
+  
+  (codecopy *scratch1* (bytecodesize) 32)
+  (sstore *multisig* (mload *scratch1*))
 
+  (codecopy *scratch2* (+ (bytecodesize) 32) 32)
+  (sstore *max-supply* (mload *scratch2*))
+  
   (returnlll 
     (seq
       get-function-id
@@ -69,11 +78,23 @@
           (return (sload *owner*))
       ))
 
+
+      (function *get-multisig*
+        (seq
+          (return (sload *multisig*))
+      ))
+
+
+      (function *get-max-supply*
+        (seq
+          (return (sload *max-supply*))
+      ))
       ;; FALLBACK FUNCTION
       ;; Only when crowdsale has started [crowdsale-state of 1]
-      ;; Will send funds to owner for now
+      ;; Will send funds to multisig for now
       (when (!= (sload *crowdsale-state*) 1)
         (revert 0 0))
+      ;; Send funds to multisig
+      (call 21000 (sload *multisig*) (callvalue) 0 0 0 0)
 
-      (call 21000 (sload *owner*) (callvalue) 0 0 0 0)
 )))
