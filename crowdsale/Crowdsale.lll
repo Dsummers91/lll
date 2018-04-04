@@ -14,9 +14,11 @@
   (def '*crowdsale-state* 0x02)
 
   ;; Function Hashes
-  (def '*start-crowdsale* 0xa39953b2)
-  (def '*get-address*     0x38cc4831)
+  (def '*start-crowdsale*     0xa39953b2)
+  (def '*get-address*         0x38cc4831)
   (def '*get-crowdsale-state* 0x2d3fb0d5)
+  (def '*get-owner*           0x8da5cb5b)
+
 
   ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
   (def 'shift-right (input)
@@ -31,8 +33,9 @@
       code-body))
 
 
-  (when(callvalue) 
+  (when(callvalue)
     (panic))
+  (sstore *owner* (caller))
 
   (returnlll 
     (seq
@@ -56,6 +59,11 @@
       (function *get-address* 
         (seq
           (return (caller))
+      ))
+
+      (function *get-owner*
+        (seq
+          (return (sload *owner*))
       ))
 
 
