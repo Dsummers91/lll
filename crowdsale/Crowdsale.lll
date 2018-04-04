@@ -43,10 +43,13 @@
 
       (function *start-crowdsale*
         (seq
-          (mstore *scratch1* (sload *crowdsale-state*))
+          ;; only owner may start crowdsale
+          (when (!= (caller) (sload *owner*))
+            (revert 0 0))
           ;; Revert if state isnt 0
           (when (> (sload *crowdsale-state*) 0)
             (revert 0 0)) 
+          (mstore *scratch1* (sload *crowdsale-state*))
           (mstore *scratch1* (add (mload *scratch1*) 1))
           (sstore *crowdsale-state* (mload *scratch1*))
       ))
@@ -66,5 +69,11 @@
           (return (sload *owner*))
       ))
 
+      ;; FALLBACK FUNCTION
+      ;; Only when crowdsale has started [crowdsale-state of 1]
+      ;; Will send funds to owner for now
+      (when (!= (sload *crowdsale-state*) 1)
+        (revert 0 0))
 
+      (call 21000 (sload *owner*) (callvalue) 0 0 0 0)
 )))
