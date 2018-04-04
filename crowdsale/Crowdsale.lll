@@ -10,7 +10,7 @@
 
   ;; Storage Locations
   (def '*owner*            0x00)
-  (def '*token-price*      0x01)
+  (def '*wei-multiplier*   0x01)
   (def '*crowdsale-state*  0x02)
   (def '*multisig*         0x03)
   (def '*max-supply*       0x04)
@@ -22,6 +22,8 @@
   (def '*get-owner*            0x8da5cb5b)
   (def '*get-multisig*         0x4783c35b)
   (def '*get-max-supply*       0xd5abeb01)
+  (def '*get-balance*          0x70a08231)
+  (def '*get-wei-multiplier*   0x9975faa2)
 
   ;; Shifts the leftmost 4 bytes of a 32-byte number right by 28 bytes.
   (def 'shift-right (input)
@@ -35,16 +37,24 @@
     (when (= (mload *funcid*) function-hash)
       code-body))
 
+  (def 'balance-of (address)
+    (address)
+  )
 
   (when(callvalue)
     (panic))
   (sstore *owner* (caller))
+  ;;; Store caller as 1000 for testing purposes..
+  (sstore (balance-of (caller)) 1000)
   
   (codecopy *scratch1* (bytecodesize) 32)
   (sstore *multisig* (mload *scratch1*))
 
   (codecopy *scratch2* (+ (bytecodesize) 32) 32)
   (sstore *max-supply* (mload *scratch2*))
+  
+  (codecopy *scratch3* (+ (bytecodesize) 64) 32)
+  (sstore *wei-multiplier* (mload *scratch3*)) ;; amount of tokens per wei eg. 1^18 wei is 5^18 tokens id multiplier is 5
   
   (returnlll 
     (seq
@@ -83,7 +93,16 @@
         (seq
           (return (sload *multisig*))
       ))
+      
+      (function *get-wei-multiplier*
+        (seq
+          (return (sload *wei-multiplier*))
+      ))
 
+      (function *get-balance*
+        (seq
+          (return (sload (balance-of (caller))))
+      ))
 
       (function *get-max-supply*
         (seq
