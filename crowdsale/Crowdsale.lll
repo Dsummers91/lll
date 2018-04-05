@@ -44,8 +44,6 @@
   (when(callvalue)
     (panic))
   (sstore *owner* (caller))
-  ;;; Store caller as 1000 for testing purposes..
-  (sstore (balance-of (caller)) 1000)
   
   (codecopy *scratch1* (bytecodesize) 32)
   (sstore *multisig* (mload *scratch1*))
@@ -54,7 +52,8 @@
   (sstore *max-supply* (mload *scratch2*))
   
   (codecopy *scratch3* (+ (bytecodesize) 64) 32)
-  (sstore *wei-multiplier* (mload *scratch3*)) ;; amount of tokens per wei eg. 1^18 wei is 5^18 tokens id multiplier is 5
+  (sstore *wei-multiplier* (mload *scratch3*)) 
+  ;; amount of tokens per wei eg. 1^18 wei is 5^18 tokens id multiplier is 5
   
   (returnlll 
     (seq
@@ -115,5 +114,8 @@
         (revert 0 0))
       ;; Send funds to multisig
       (call 21000 (sload *multisig*) (callvalue) 0 0 0 0)
+      ;; Increase balance by wei sent * weiMultiplier
+      (sstore (balance-of (caller)) 
+        (+ (sload (balance-of (caller))) (* (sload *wei-multiplier*) (callvalue))))
 
 )))
