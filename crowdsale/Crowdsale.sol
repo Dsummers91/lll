@@ -7,7 +7,7 @@ contract Crowdsale {
   uint256 public weiMultiplier;
 
   function Crowdsale(address multisig, uint256 maxSupply, uint256 weiMultiplier) {}
- 
+
   function startCrowdsale() {}
   function getAddress() constant returns (address) {}
   function getCrowdsaleState() public view returns (uint256) {}

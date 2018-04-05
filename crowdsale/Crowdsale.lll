@@ -38,13 +38,12 @@
       code-body))
 
   (def 'balance-of (address)
-    (address)
+    address
   )
 
   (when(callvalue)
     (panic))
   (sstore *owner* (caller))
-  
   (codecopy *scratch1* (bytecodesize) 32)
   (sstore *multisig* (mload *scratch1*))
 
@@ -100,7 +99,7 @@
 
       (function *get-balance*
         (seq
-          (return (sload (balance-of (caller))))
+          (return (sload (balance-of (calldataload 0x04))))
       ))
 
       (function *get-max-supply*
