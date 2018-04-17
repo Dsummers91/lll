@@ -51,7 +51,7 @@ Function signatures:
 32cafedd: getConstructorParameter()
 ```
 
-That is where the function is stored in memory
+That is where the keccak hash of the function (hash of "getConstructorParameter()" is 32cafedd)
 
 Put that in contract
 
